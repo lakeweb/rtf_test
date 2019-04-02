@@ -1,40 +1,13 @@
-========================================================================
-    CONSOLE APPLICATION : rtf_test Project Overview
-========================================================================
 
-AppWizard has created this rtf_test application for you.
+The CRichEditCtrl turns out to be a bit unfriendly as far as concatenating RTF docs. The streamer works on insertion, so it is incapable of adding more content to the end of a doc. There may be some flag, but I could not find it in RichEdit.h.
+What happens is the font characteristics  from the end of the doc that is being pasted to, is set at the end of the doc after the insertion. like:
 
-This file contains a summary of what you will find in each of the files that
-make up your rtf_test application.
+Control text, say red.
+Inserted text, say black.
 
+Result, if the user types into the bottom of the doc, the font size/color will follow like red.
 
-rtf_test.vcxproj
-    This is the main project file for VC++ projects generated using an Application Wizard.
-    It contains information about the version of Visual C++ that generated the file, and
-    information about the platforms, configurations, and project features selected with the
-    Application Wizard.
+It will be from the text above the insertion. Even if you SetSel(-1,-1). The best I could think of was a parser hack on the RTF text. It can be seen in the call: AppendRichText(...) AppendRichText assumes you want to end the document with paragaph control word.
 
-rtf_test.vcxproj.filters
-    This is the filters file for VC++ projects generated using an Application Wizard. 
-    It contains information about the association between the files in your project 
-    and the filters. This association is used in the IDE to show grouping of files with
-    similar extensions under a specific node (for e.g. ".cpp" files are associated with the
-    "Source Files" filter).
-
-rtf_test.cpp
-    This is the main application source file.
-
-/////////////////////////////////////////////////////////////////////////////
-Other standard files:
-
-StdAfx.h, StdAfx.cpp
-    These files are used to build a precompiled header (PCH) file
-    named rtf_test.pch and a precompiled types file named StdAfx.obj.
-
-/////////////////////////////////////////////////////////////////////////////
-Other notes:
-
-AppWizard uses "TODO:" comments to indicate parts of the source code you
-should add to or customize.
-
-/////////////////////////////////////////////////////////////////////////////
+Another thing I learned, and I certainly could not find it in the 'Word2007RTFSpec9', that if you want to end a doc with a paragraph marker, you must use two \par control words at the end of the doc.
+CRichEditCtrl, Word, Open Office all add two \par in the case of ending with a \par.
